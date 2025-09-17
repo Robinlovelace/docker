@@ -15,49 +15,55 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-RUN wget https://github.com/rocker-org/rocker-versioned2/raw/refs/heads/master/scripts/install_R_source.sh
-RUN bash install_R_source.sh
+# RUN wget https://github.com/rocker-org/rocker-versioned2/raw/refs/heads/master/scripts/install_R_source.sh
+# RUN bash install_R_source.sh
+# and install geospatial R packages
+RUN wget https://raw.githubusercontent.com/geocompx/rocker-rspatial/main/install_rspatial.sh
+RUN bash install_rspatial.sh
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # rspatial deps:
-    libgdal-dev \
-    libproj-dev \
-    libudunits2-dev \
-    libspatialindex-dev \
-    libabsl-dev \
-    libgeos-dev \
-    libsqlite3-dev \
-    libtiff-dev \
-    libjpeg-dev \
-    libpng-dev \
-    zlib1g-dev \
-    libfontconfig1-dev \
-    libfreetype6-dev \
-    build-essential \
-    libharfbuzz-dev \
-    libfribidi-dev \
-    libv8-dev \
-    libmagick++-dev \
-    cmake \
-    && rm -rf /var/lib/apt/lists/*
+# RETICULATE_PYTHON="/usr/local/bin/python"
+ENV RETICULATE_PYTHON="/usr/bin/python3"
 
-# Install ragg and its dependencies for high-quality headless graphics
-RUN R -e "install.packages(c('ragg', 'systemfonts', 'textshaping'))"
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     # rspatial deps:
+#     libgdal-dev \
+#     libproj-dev \
+#     libudunits2-dev \
+#     libspatialindex-dev \
+#     libabsl-dev \
+#     libgeos-dev \
+#     libsqlite3-dev \
+#     libtiff-dev \
+#     libjpeg-dev \
+#     libpng-dev \
+#     zlib1g-dev \
+#     libfontconfig1-dev \
+#     libfreetype6-dev \
+#     build-essential \
+#     libharfbuzz-dev \
+#     libfribidi-dev \
+#     libv8-dev \
+#     libmagick++-dev \
+#     cmake \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Configure R to use ragg as the default graphics device
-RUN mkdir -p /etc/R && \
-    echo "options(repos = c(CRAN = 'https://cloud.r-project.org'))" > /etc/R/Rprofile.site && \
-    echo "if (requireNamespace('ragg', quietly = TRUE)) { options(device = ragg::agg_png) }" >> /etc/R/Rprofile.site && \
-    echo 'options(Ncpus = parallel::detectCores())' >> /etc/R/Rprofile.site
+# # Install ragg and its dependencies for high-quality headless graphics
+# RUN R -e "install.packages(c('ragg', 'systemfonts', 'textshaping'))"
 
-# Install sf:
-RUN R -e "install.packages('sf', repos = 'https://cloud.r-project.org')"
-# Install remotes for GitHub installs:
-RUN R -e "install.packages('remotes', repos = 'https://cloud.r-project.org')"
-# Install bookdown for book building:
-RUN R -e "install.packages('bookdown', repos = 'https://cloud.r-project.org')"
-# Install geocompx:
-RUN R -e "install.packages('geocompkg', repos = c('https://geocompx.r-universe.dev', 'https://cloud.r-project.org'), dependencies = TRUE, force = TRUE)"
+# # Configure R to use ragg as the default graphics device
+# RUN mkdir -p /etc/R && \
+#     echo "options(repos = c(CRAN = 'https://cloud.r-project.org'))" > /etc/R/Rprofile.site && \
+#     echo "if (requireNamespace('ragg', quietly = TRUE)) { options(device = ragg::agg_png) }" >> /etc/R/Rprofile.site && \
+#     echo 'options(Ncpus = parallel::detectCores())' >> /etc/R/Rprofile.site
+
+# # Install sf:
+# RUN R -e "install.packages('sf', repos = 'https://cloud.r-project.org')"
+# # Install remotes for GitHub installs:
+# RUN R -e "install.packages('remotes', repos = 'https://cloud.r-project.org')"
+# # Install bookdown for book building:
+# RUN R -e "install.packages('bookdown', repos = 'https://cloud.r-project.org')"
+# # Install geocompx:
+# RUN R -e "install.packages('geocompkg', repos = c('https://geocompx.r-universe.dev', 'https://cloud.r-project.org'), dependencies = TRUE, force = TRUE)"
 
 # # build the book
 # RUN wget https://github.com/geocompx/geocompr/archive/main.zip && \
